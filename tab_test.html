@@ -1,70 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabbing within Selected Divs</title>
-    <style>
-        .selected {
-            display: block;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Navigation</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    td {
+      border: 1px solid black;
+      padding: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <div id="div1" class="selected">
-        <input type="text">
-        <input type="text">
-    </div>
 
-    <div id="div2" class="hidden">
-        <input type="text">
-        <input type="text">
-    </div>
+<div id="table-container">
+  <table>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+      <td>Cell 3</td>
+    </tr>
+    <tr>
+      <td>Cell 4</td>
+      <td>Cell 5</td>
+      <td>Cell 6</td>
+    </tr>
+  </table>
+</div>
 
-    <button id="btnNext">Next</button>
+<script>
+  $(document).ready(function() {
+    // Assign tabindex to td elements
+    $('#table-container td').each(function(index) {
+      $(this).attr('tabindex', index + 1);
+    });
 
-    <script>
-        document.getElementById('btnNext').addEventListener('click', function() {
-            toggleDivs();
-            setTabIndex();
-            document.querySelector('.selected input').focus();
-        });
+    // Handle keypress event within the table container div
+    $('#table-container').on('keydown', 'td', function(e) {
+      // If the pressed key is the tab key
+      if (e.keyCode === 9) {
+        e.preventDefault(); // Prevent default tab behavior
 
-        function toggleDivs() {
-            var divs = document.querySelectorAll('.selected, .hidden');
-            divs.forEach(function(div) {
-                div.classList.toggle('selected');
-                div.classList.toggle('hidden');
-            });
+        // Get the index of the current td
+        var currentIndex = $(this).attr('tabindex');
+
+        // Find the next td
+        var nextIndex = parseInt(currentIndex) + 1;
+        var nextCell = $('[tabindex="' + nextIndex + '"]');
+
+        // If next cell exists, focus on it
+        if (nextCell.length) {
+          nextCell.focus();
+        } else {
+          // If the last cell is reached, focus on the first cell
+          $('[tabindex="1"]').focus();
         }
+      }
+    });
+  });
+</script>
 
-        function setTabIndex() {
-            var selectedDiv = document.querySelector('.selected');
-            var inputs = selectedDiv.querySelectorAll('input');
-            inputs.forEach(function(input, index) {
-                input.tabIndex = index + 1; // Start tabindex from 1
-            });
-        }
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Tab') {
-                event.preventDefault();
-                var focusableElements = document.querySelectorAll('.selected input');
-                var focusableArray = Array.prototype.slice.call(focusableElements);
-                var focusedIndex = focusableArray.indexOf(document.activeElement);
-                if (focusedIndex === -1 || focusedIndex === focusableArray.length - 1) {
-                    toggleDivs();
-                    setTabIndex();
-                    document.querySelector('.selected input').focus();
-                } else {
-                    focusableArray[focusedIndex + 1].focus();
-                }
-            }
-        });
-    </script>
 </body>
 </html>
