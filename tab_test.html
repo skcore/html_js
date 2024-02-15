@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabbing within Selected Divs</title>
+    <style>
+        .selected {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="div1" class="selected">
+        <input type="text">
+        <input type="text">
+    </div>
+
+    <div id="div2" class="hidden">
+        <input type="text">
+        <input type="text">
+    </div>
+
+    <button id="btnNext">Next</button>
+
+    <script>
+        document.getElementById('btnNext').addEventListener('click', function() {
+            toggleDivs();
+            setTabIndex();
+            document.querySelector('.selected input').focus();
+        });
+
+        function toggleDivs() {
+            var divs = document.querySelectorAll('.selected, .hidden');
+            divs.forEach(function(div) {
+                div.classList.toggle('selected');
+                div.classList.toggle('hidden');
+            });
+        }
+
+        function setTabIndex() {
+            var selectedDiv = document.querySelector('.selected');
+            var inputs = selectedDiv.querySelectorAll('input');
+            inputs.forEach(function(input, index) {
+                input.tabIndex = index + 1; // Start tabindex from 1
+            });
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Tab') {
+                event.preventDefault();
+                var focusableElements = document.querySelectorAll('.selected input');
+                var focusableArray = Array.prototype.slice.call(focusableElements);
+                var focusedIndex = focusableArray.indexOf(document.activeElement);
+                if (focusedIndex === -1 || focusedIndex === focusableArray.length - 1) {
+                    toggleDivs();
+                    setTabIndex();
+                    document.querySelector('.selected input').focus();
+                } else {
+                    focusableArray[focusedIndex + 1].focus();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
